@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
-import { Plus, ChevronDown } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 type Props = {
   onAdd: (text: string, priority: 'low' | 'medium' | 'high') => void;
+};
+
+const priorityPillActive: Record<string, React.CSSProperties> = {
+  low:    { background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0' },
+  medium: { background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' },
+  high:   { background: '#fff1f2', color: '#e11d48', border: '1px solid #fecdd3' },
 };
 
 export default function TaskForm({ onAdd }: Props) {
@@ -16,64 +22,109 @@ export default function TaskForm({ onAdd }: Props) {
     setText('');
   };
 
-  const priorityColors = {
-    low: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    medium: 'bg-amber-100 text-amber-700 border-amber-200',
-    high: 'bg-rose-100 text-rose-700 border-rose-200',
-  };
+  const isDisabled = !text.trim();
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-      <form onSubmit={handleSubmit} className="p-4">
-        <div className="flex gap-3">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              value={text}
-              onChange={e => setText(e.target.value)}
-              placeholder="What needs to be done?"
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 transition-all duration-200 text-slate-700 placeholder:text-slate-400"
-            />
-          </div>
+    <div
+      className="rounded-[12px] p-4 sm:p-5 transition-shadow duration-150"
+      style={{
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
+        boxShadow: 'var(--shadow-xs)',
+      }}
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        {/* Text input */}
+        <div className="flex-1">
+          <input
+            type="text"
+            value={text}
+            onChange={e => setText(e.target.value)}
+            placeholder="What needs to be done?"
+            className="w-full px-4 py-2.5 rounded-[8px] text-sm transition-all duration-150 focus:outline-none"
+            style={{
+              background: 'var(--color-surface-2)',
+              border: '1px solid var(--color-border)',
+              color: 'var(--color-text)',
+            }}
+            onFocus={e => {
+              e.currentTarget.style.borderColor = 'var(--color-primary)';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgb(99 102 241 / .15)';
+            }}
+            onBlur={e => {
+              e.currentTarget.style.borderColor = 'var(--color-border)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          />
+        </div>
 
-          <div className="flex items-center">
-            <select
-              value={priority}
-              onChange={e => setPriority(e.target.value as 'low' | 'medium' | 'high')}
-              className={`px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/40 cursor-pointer font-medium text-sm ${priorityColors[priority]} border-transparent`}
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
+        {/* Priority select + Add button */}
+        <div className="flex items-center gap-2.5">
+          <select
+            value={priority}
+            onChange={e => setPriority(e.target.value as 'low' | 'medium' | 'high')}
+            aria-label="Select task priority"
+            className="px-3 py-2.5 rounded-[8px] text-xs font-semibold cursor-pointer transition-all duration-150 focus:outline-none capitalize"
+            style={{
+              background: 'var(--color-surface-2)',
+              border: '1px solid var(--color-border)',
+              color: 'var(--color-text)',
+            }}
+            onFocus={e => {
+              e.currentTarget.style.borderColor = 'var(--color-primary)';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgb(99 102 241 / .15)';
+            }}
+            onBlur={e => {
+              e.currentTarget.style.borderColor = 'var(--color-border)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            <option value="low">Low Priority</option>
+            <option value="medium">Medium Priority</option>
+            <option value="high">High Priority</option>
+          </select>
 
           <button
             type="submit"
-            disabled={!text.trim()}
-            className="px-5 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 disabled:from-slate-300 disabled:to-slate-300 text-white rounded-xl transition-all duration-200 flex items-center gap-2 font-semibold shadow-md shadow-indigo-200 hover:shadow-lg disabled:shadow-none active:scale-95"
+            disabled={isDisabled}
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[8px] text-xs font-semibold text-white whitespace-nowrap transition-all duration-150 active:scale-[.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+            style={{
+              background: isDisabled ? 'var(--color-surface-2)' : 'var(--color-primary)',
+              color: isDisabled ? 'var(--color-text-muted)' : '#fff',
+              cursor: isDisabled ? 'not-allowed' : 'pointer',
+              boxShadow: isDisabled ? 'none' : '0 1px 3px rgb(99 102 241 / .4)',
+            }}
+            onMouseEnter={e => { if (!isDisabled) e.currentTarget.style.background = 'var(--color-primary-hover)'; }}
+            onMouseLeave={e => { if (!isDisabled) e.currentTarget.style.background = 'var(--color-primary)'; }}
           >
-            <Plus size={18} />
+            <Plus size={15} strokeWidth={2.5} />
             <span>Add Task</span>
           </button>
         </div>
       </form>
 
-      {/* Priority quick select */}
-      <div className="px-4 pb-3 flex gap-2">
+      {/* Quick priority pills */}
+      <div className="mt-3.5 flex items-center gap-2 flex-wrap">
+        <span className="text-[11px] font-medium" style={{ color: 'var(--color-text-muted)' }}>
+          Quick priority:
+        </span>
         {(['low', 'medium', 'high'] as const).map(p => (
           <button
             key={p}
+            type="button"
             onClick={() => setPriority(p)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all duration-150 border ${
+            className="px-2.5 py-1 rounded-[6px] text-[11px] font-semibold capitalize transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            style={
               priority === p
-                ? p === 'low' ? 'bg-emerald-100 text-emerald-700 border-emerald-300'
-                : p === 'medium' ? 'bg-amber-100 text-amber-700 border-amber-300'
-                : 'bg-rose-100 text-rose-700 border-rose-300'
-                : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
-            }`}
+                ? priorityPillActive[p]
+                : {
+                    background: 'var(--color-surface-2)',
+                    border: '1px solid var(--color-border)',
+                    color: 'var(--color-text-muted)',
+                  }
+            }
           >
-            {p} priority
+            {p}
           </button>
         ))}
       </div>

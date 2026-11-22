@@ -1,37 +1,161 @@
+/* ─── Google Inter font ─────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  /* ── Light-mode tokens ── */
+  :root {
+    --color-bg:            #f8fafc;
+    --color-surface:       #ffffff;
+    --color-surface-2:     #f1f5f9;
+    --color-text:          #0f172a;
+    --color-text-muted:    #64748b;
+    --color-border:        #e2e8f0;
+    --color-border-hover:  #c7d2fe;
+    --color-primary:       #6366f1;
+    --color-primary-hover: #4f46e5;
+    --color-primary-light: #eef2ff;
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / .05);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / .08), 0 1px 2px -1px rgb(0 0 0 / .05);
+  }
+
+  /* ── Dark-mode tokens (auto via prefers-color-scheme, overridden by data-theme="dark") ── */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --color-bg:            #0f172a;
+      --color-surface:       #1e293b;
+      --color-surface-2:     #0f172a;
+      --color-text:          #f1f5f9;
+      --color-text-muted:    #94a3b8;
+      --color-border:        #334155;
+      --color-border-hover:  #4f46e5;
+      --color-primary:       #6366f1;
+      --color-primary-hover: #818cf8;
+      --color-primary-light: #1e1b4b;
+      --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / .4);
+      --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / .4), 0 1px 2px -1px rgb(0 0 0 / .3);
+    }
+  }
+
+  /* Manual dark override */
+  :root[data-theme="dark"] {
+    --color-bg:            #0f172a;
+    --color-surface:       #1e293b;
+    --color-surface-2:     #0f172a;
+    --color-text:          #f1f5f9;
+    --color-text-muted:    #94a3b8;
+    --color-border:        #334155;
+    --color-border-hover:  #4f46e5;
+    --color-primary:       #6366f1;
+    --color-primary-hover: #818cf8;
+    --color-primary-light: #1e1b4b;
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / .4);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / .4), 0 1px 2px -1px rgb(0 0 0 / .3);
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-slate-100 text-slate-800 font-sans antialiased selection:bg-indigo-500 selection:text-white;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6;
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  ::selection {
+    background-color: var(--color-primary);
+    color: #ffffff;
   }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+/* ─── Keyframes ─────────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgb(16 185 129 / .4); }
+  70%  { box-shadow: 0 0 0 6px rgb(16 185 129 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(16 185 129 / 0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* ─── Utility classes ───────────────────────────────────────────────── */
+.animate-fade-in-up {
+  animation: fadeInUp 0.2s ease-out forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.18s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.18s ease-out forwards;
+}
+
+/* Legacy alias kept so existing code still works */
 .animate-fade-in {
-  animation: fadeIn 0.25s ease-out forwards;
+  animation: fadeInUp 0.2s ease-out forwards;
 }
 
-/* Custom Scrollbar for activity event logs */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* ─── Pulsing green status dot ───────────────────────────────────────── */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulse-ring 2s ease-out infinite;
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
+/* ─── Custom card surface ────────────────────────────────────────────── */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow 0.15s, border-color 0.15s;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+.card:hover {
+  box-shadow: var(--shadow-sm);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+/* ─── Focus ring ─────────────────────────────────────────────────────── */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
+
+/* ─── Custom scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
