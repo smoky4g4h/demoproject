@@ -4,7 +4,7 @@ import TaskList from './TaskList';
 import TaskForm from './TaskForm';
 import FilterBar from './FilterBar';
 import StatsPanel from './StatsPanel';
-import { CheckCircle2, LayoutDashboard, Zap, Shield, Sparkles } from 'lucide-react';
+import { CheckCircle2, LayoutDashboard, Shield, Sparkles, Moon, Sun } from 'lucide-react';
 
 type Task = {
   id: string;
@@ -26,6 +26,16 @@ export default function TodoApp() {
   const [filter, setFilter] = useState<Filter>('all');
   const [sessionData, setSessionData] = useState<any>(null);
   const [userState, setUserState] = useState<string>('active');
+  const [darkMode, setDarkMode] = useState<boolean>(false);
+
+  // Sync dark mode state with HTML attribute
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  }, [darkMode]);
 
   // Track app opened on first load
   useEffect(() => {
@@ -107,106 +117,209 @@ export default function TodoApp() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans text-slate-800">
-      {/* Top Banner / Navbar */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs backdrop-blur-md bg-white/90">
-        <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-200">
-              <CheckCircle2 size={22} />
+    <div className="min-h-screen bg-[#f8fafc] [data-theme='dark']:bg-[#0f172a] flex flex-col transition-colors duration-200"
+         style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
+
+      {/* ── 1. Header bar ─────────────────────────────────────────── */}
+      <header
+        className="sticky top-0 z-30 backdrop-blur-md"
+        style={{
+          background: 'color-mix(in srgb, var(--color-surface) 92%, transparent)',
+          borderBottom: '1px solid var(--color-border)',
+          boxShadow: 'var(--shadow-xs)',
+        }}
+      >
+        <div className="max-w-[900px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+          {/* Logo + wordmark */}
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-[10px] bg-indigo-500 flex items-center justify-center text-white flex-shrink-0"
+                 style={{ boxShadow: '0 2px 8px rgb(99 102 241 / .35)' }}>
+              <CheckCircle2 size={18} strokeWidth={2.2} />
             </div>
-            <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-700 to-violet-700 bg-clip-text text-transparent">
+            <div className="min-w-0">
+              <h1 className="text-[15px] font-bold tracking-tight truncate leading-tight"
+                  style={{ color: 'var(--color-text)' }}>
                 TaskPulse Pro
               </h1>
-              <p className="text-xs text-slate-400 font-medium">Powered by activity-tracker-lite</p>
+              <p className="text-[10px] font-medium hidden sm:block leading-none mt-0.5"
+                 style={{ color: 'var(--color-text-muted)' }}>
+                Activity-tracker-lite integrated
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-full text-xs font-semibold text-slate-600 border border-slate-200">
-              <span className={`w-2.5 h-2.5 rounded-full ${userState === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-              User Status: <span className="capitalize">{userState}</span>
+          {/* Right controls */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Real-time Activity Monitored indicator */}
+            <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
+                 style={{
+                   background: 'var(--color-surface-2)',
+                   border: '1px solid var(--color-border)',
+                   color: 'var(--color-text-muted)',
+                 }}>
+              <span className="status-dot" aria-label="Live monitoring active" />
+              Real-time Activity Monitored
             </div>
+
+            {/* User status chip */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                 style={{
+                   background: 'var(--color-primary-light)',
+                   border: '1px solid color-mix(in srgb, var(--color-primary) 25%, transparent)',
+                   color: 'var(--color-primary)',
+                 }}>
+              <span
+                className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${userState === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}
+              />
+              <span className="capitalize">{userState}</span>
+            </div>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="w-8 h-8 flex items-center justify-center rounded-[8px] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              style={{ color: 'var(--color-text-muted)' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-surface-2)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+            >
+              {darkMode ? <Sun size={16} strokeWidth={2} /> : <Moon size={16} strokeWidth={2} />}
+            </button>
+
+            {/* Analytics Dashboard button */}
             <a
               href="/analytics"
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-sm hover:shadow transition-all duration-200 flex items-center gap-2 text-sm font-semibold group"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-semibold text-white transition-all duration-150 active:scale-[.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+              style={{ background: 'var(--color-primary)', boxShadow: '0 1px 3px rgb(99 102 241 / .4)' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-primary-hover)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'var(--color-primary)')}
             >
-              <LayoutDashboard size={17} className="transition-transform group-hover:scale-110" />
-              Analytics Dashboard
+              <LayoutDashboard size={14} strokeWidth={2} />
+              <span className="hidden sm:inline">Analytics Dashboard</span>
+              <span className="sm:hidden">Analytics</span>
             </a>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-6xl w-full mx-auto px-4 py-8 flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left / Center Tasks Section */}
-          <div className="lg:col-span-2 space-y-6 animate-fade-in">
-            <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-6 text-white shadow-lg shadow-indigo-100 relative overflow-hidden">
-              <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none" />
-              <div className="relative z-10 flex items-start justify-between">
-                <div>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-medium mb-3">
-                    <Sparkles size={13} /> Real-time Activity Monitored
+      {/* ── Main content ───────────────────────────────────────────── */}
+      <main className="max-w-[900px] w-full mx-auto px-4 sm:px-6 py-8 flex-1 flex flex-col gap-5">
+
+        {/* ── 2. Welcome / hero section ────────────────────────────── */}
+        <section
+          className="rounded-[12px] p-6 relative overflow-hidden animate-fade-in-up"
+          style={{
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            boxShadow: 'var(--shadow-xs)',
+          }}
+        >
+          {/* Decorative indigo blob */}
+          <div className="pointer-events-none absolute -right-8 -top-8 w-40 h-40 rounded-full bg-indigo-500/8 blur-3xl" />
+          <div className="pointer-events-none absolute right-20 -bottom-6 w-24 h-24 rounded-full bg-violet-500/6 blur-2xl" />
+
+          <div className="relative z-10">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold mb-3"
+                  style={{
+                    background: 'var(--color-primary-light)',
+                    border: '1px solid color-mix(in srgb, var(--color-primary) 20%, transparent)',
+                    color: 'var(--color-primary)',
+                  }}>
+              <Sparkles size={11} strokeWidth={2.5} />
+              SaaS Workspace
+            </span>
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight mb-1.5 leading-snug"
+                style={{ color: 'var(--color-text)' }}>
+              Welcome back, Developer! 👋
+            </h2>
+            <p className="text-sm max-w-lg leading-relaxed"
+               style={{ color: 'var(--color-text-muted)' }}>
+              Manage your tasks with zero friction. Every interaction is tracked seamlessly in real-time.
+            </p>
+          </div>
+        </section>
+
+        {/* ── 3. Add-task card ─────────────────────────────────────── */}
+        <section>
+          <TaskForm onAdd={addTask} />
+        </section>
+
+        {/* ── 4. Filter tabs ───────────────────────────────────────── */}
+        <section>
+          <FilterBar current={filter} onChange={changeFilter} />
+        </section>
+
+        {/* ── 5. Task list ─────────────────────────────────────────── */}
+        <section>
+          <TaskList
+            tasks={filteredTasks}
+            onToggle={toggleTask}
+            onDelete={deleteTask}
+            onUpdate={updateTask}
+          />
+        </section>
+
+        {/* ── 6. Stats section ─────────────────────────────────────── */}
+        <section>
+          <StatsPanel stats={stats} />
+        </section>
+
+        {/* Additional Activity Stats Panel from tracker */}
+        <section>
+          <StatsPanel fromTracker={tracker} />
+        </section>
+
+        {/* Active Session State card */}
+        {sessionData && (
+          <section
+            className="rounded-[12px] p-5"
+            style={{
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              boxShadow: 'var(--shadow-xs)',
+            }}
+          >
+            <h3 className="text-sm font-bold mb-4 flex items-center gap-2"
+                style={{ color: 'var(--color-text)' }}>
+              <Shield size={15} className="text-indigo-500" />
+              Active Session State
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+              {[
+                { label: 'Session ID', value: `${sessionData.id.slice(0, 8)}…`, mono: true },
+                { label: 'Duration', value: `${Math.round((Date.now() - sessionData.startTime) / 1000)}s` },
+                { label: 'Inactivity Limit', value: '60s' },
+              ].map(({ label, value, mono }) => (
+                <div
+                  key={label}
+                  className="flex justify-between sm:flex-col gap-1 p-3 rounded-[8px]"
+                  style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)' }}
+                >
+                  <span style={{ color: 'var(--color-text-muted)' }}>{label}</span>
+                  <span className={`font-semibold ${mono ? 'font-mono' : ''}`}
+                        style={{ color: 'var(--color-text)' }}>
+                    {value}
                   </span>
-                  <h2 className="text-2xl font-bold tracking-tight mb-1">Welcome back, Developer!</h2>
-                  <p className="text-indigo-100 text-sm max-w-md">
-                    Every task interaction, filter change, and idle timeout is being captured seamlessly by your tracker package.
-                  </p>
                 </div>
-              </div>
+              ))}
             </div>
-
-            <TaskForm onAdd={addTask} />
-            <FilterBar current={filter} onChange={changeFilter} />
-            <TaskList
-              tasks={filteredTasks}
-              onToggle={toggleTask}
-              onDelete={deleteTask}
-              onUpdate={updateTask}
-            />
-          </div>
-
-          {/* Right Sidebar Stats & Info */}
-          <div className="space-y-6 animate-fade-in">
-            <StatsPanel stats={stats} />
-            <StatsPanel fromTracker={tracker} />
-
-            {sessionData && (
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-                  <Shield size={18} className="text-indigo-600" /> Active Session State
-                </h3>
-                <div className="space-y-3.5 text-sm">
-                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500">Session ID</span>
-                    <span className="font-mono text-xs font-semibold bg-slate-100 text-slate-700 px-2 py-1 rounded">
-                      {sessionData.id.slice(0, 8)}...
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500">Duration</span>
-                    <span className="font-semibold text-slate-700">
-                      {Math.round((Date.now() - sessionData.startTime) / 1000)}s
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-1.5">
-                    <span className="text-slate-500">Inactivity Limit</span>
-                    <span className="font-semibold text-slate-700">60s</span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+          </section>
+        )}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-6 mt-12">
-        <div className="max-w-6xl mx-auto px-4 text-center text-xs text-slate-400">
-          Built with <span className="text-indigo-600 font-medium">activity-tracker-lite</span> & React 19. All events stored locally in memory.
+      {/* ── Footer ─────────────────────────────────────────────────── */}
+      <footer
+        className="py-5 mt-4"
+        style={{
+          borderTop: '1px solid var(--color-border)',
+          background: 'var(--color-surface)',
+        }}
+      >
+        <div className="max-w-[900px] mx-auto px-4 sm:px-6 text-center text-[11px]"
+             style={{ color: 'var(--color-text-muted)' }}>
+          TaskPulse Pro &nbsp;•&nbsp; Built with{' '}
+          <span className="text-indigo-500 font-semibold">activity-tracker-lite</span>
+          {' '}&amp; React 19
         </div>
       </footer>
     </div>
